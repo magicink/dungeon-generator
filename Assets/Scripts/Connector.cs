@@ -8,19 +8,16 @@ public class Connector : MonoBehaviour
     [SerializeField] private Vector2 size = Vector2.one * 4.0f;
     private Vector2 _halfSize;
 
-    private void Start()
-    {
-    }
-
     private void OnDrawGizmos()
     {
         _halfSize = size * 0.5f;
         Gizmos.color = Color.cyan;
-        var offset = transform.position + Vector3.up * _halfSize.y;
-        var normal = offset + Vector3.forward;
+        var t = transform;
+        var offset = t.position + Vector3.up * _halfSize.y;
+        var forward = Quaternion.Euler(t.eulerAngles) * Vector3.forward;
+        var normal = offset + forward;
         Gizmos.DrawSphere(normal, 0.10f);
         Gizmos.DrawLine(offset, normal);
-        var t = transform;
         var top = t.up * size.y;
         var halfWidth = t.right * _halfSize.x;
         var position = t.position;
