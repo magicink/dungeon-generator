@@ -10,14 +10,14 @@ public class Connector : MonoBehaviour
         _halfSize = size * 0.5f;
         Gizmos.color = Color.cyan;
         var t = transform;
-        var offset = t.position + Vector3.up * _halfSize.y;
+        var position = t.position;
+        var offset = position + Vector3.up * _halfSize.y;
         var forward = Quaternion.Euler(t.eulerAngles) * Vector3.forward;
         var normal = offset + forward;
         Gizmos.DrawSphere(normal, 0.10f);
         Gizmos.DrawLine(offset, normal);
         var top = t.up * size.y;
         var halfWidth = t.right * _halfSize.x;
-        var position = t.position;
         var topRight = position + top + halfWidth;
         var topLeft = position + top - halfWidth;
         var bottomRight = position + halfWidth;
