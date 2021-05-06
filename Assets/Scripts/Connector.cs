@@ -3,6 +3,9 @@ using UnityEngine;
 public class Connector : MonoBehaviour
 {
     [SerializeField] private Vector2 size = Vector2.one * 4.0f;
+    
+    public bool Connected { get; set; }
+    
     private Vector2 _halfSize;
 
     private void OnDrawGizmos()
