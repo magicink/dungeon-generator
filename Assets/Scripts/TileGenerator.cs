@@ -17,7 +17,12 @@ public class TileGenerator : MonoBehaviour
     {
         _from = CreateStartTile();
         _to = CreateTile();
-        ConnectTiles();
+        for (var i = 0; i < 10; i++)
+        {
+            ConnectTiles();
+            _from = _to;
+            _to = CreateTile();
+        }
     }
 
     private void Update()
@@ -34,6 +39,7 @@ public class TileGenerator : MonoBehaviour
         var capIndex = Random.Range(0, capTiles.Length);
         var rotationIndex = Random.Range(0, _startRotation.Length);
         var startCap = Instantiate(capTiles[capIndex], Vector3.zero, Quaternion.identity, transform);
+        startCap.name = "Starting Tile";
         var rotation = _startRotation[rotationIndex];
         startCap.transform.Rotate(0, rotation, 0);
         return startCap.transform;
@@ -56,14 +62,18 @@ public class TileGenerator : MonoBehaviour
 
     private void ConnectTiles()
     {
-        if (_from)
-        {
-            var fromConnector = GetConnector(_from);
-        }
-
-        if (_to)
-        {
-            var toConnector = GetConnector(_to);
-        }
+        if (!_from) return;
+        var fromConnector = GetConnector(_from);
+        if (!fromConnector) return;
+        if (!_to) return;
+        var toConnector = GetConnector(_to);
+        if (!toConnector) return;
+        toConnector.SetParent(fromConnector);
+        _to.SetParent(toConnector);
+        toConnector.localPosition = Vector3.zero;
+        toConnector.localRotation = Quaternion.identity;
+        toConnector.Rotate(0, 180f, 0);
+        _to.SetParent(transform);
+        toConnector.SetParent(_to);
     }
 }
