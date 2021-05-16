@@ -399,9 +399,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: fd6208eff51a7874ebb43adca18ea0c1, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  mainLength: 7
+  mainLength: 5
   branches: 2
-  branchLength: 2
+  branchLength: 5
   buildDelay: 0.1
   capTiles:
   - {fileID: 2734385342340624190, guid: 0561864665818bb429a69cb7de84635d, type: 3}
@@ -447,6 +447,10 @@ PrefabInstance:
     - target: {fileID: 4244101088529847820, guid: a5d7a737600b63040a1ec9bb3ee1e9dc, type: 3}
       propertyPath: m_Name
       value: FP Controller
+      objectReference: {fileID: 0}
+    - target: {fileID: 4244101088529847820, guid: a5d7a737600b63040a1ec9bb3ee1e9dc, type: 3}
+      propertyPath: m_IsActive
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 4244101088529847822, guid: a5d7a737600b63040a1ec9bb3ee1e9dc, type: 3}
       propertyPath: m_RootOrder

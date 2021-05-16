@@ -134,9 +134,7 @@ GameObject:
   - component: {fileID: 3532865351046692520}
   - component: {fileID: 5576450602518760840}
   - component: {fileID: 4600519350148969012}
-  - component: {fileID: -3587830795321676954}
   - component: {fileID: 1447308287597532617}
-  - component: {fileID: 6042952454494123310}
   m_Layer: 6
   m_Name: Hall I
   m_TagString: Untagged
@@ -225,22 +223,6 @@ MeshCollider:
   m_Convex: 0
   m_CookingOptions: 30
   m_Mesh: {fileID: -7372182404366515707, guid: 8f5c629b41d953044af8c6743e6e1f82, type: 3}
---- !u!54 &-3587830795321676954
-Rigidbody:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 8955468767619284808}
-  serializedVersion: 2
-  m_Mass: 1
-  m_Drag: 0
-  m_AngularDrag: 0.05
-  m_UseGravity: 0
-  m_IsKinematic: 1
-  m_Interpolate: 0
-  m_Constraints: 0
-  m_CollisionDetection: 0
 --- !u!114 &1447308287597532617
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -253,19 +235,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f36d270a489b3464180c805a094dab17, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
---- !u!65 &6042952454494123310
-BoxCollider:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 8955468767619284808}
-  m_Material: {fileID: 0}
-  m_IsTrigger: 1
-  m_Enabled: 1
-  serializedVersion: 2
-  m_Size: {x: 4, y: 5, z: 18}
-  m_Center: {x: 0, y: 2.5, z: 0}
 --- !u!1001 &2227300668951693815
 PrefabInstance:
   m_ObjectHideFlags: 0
