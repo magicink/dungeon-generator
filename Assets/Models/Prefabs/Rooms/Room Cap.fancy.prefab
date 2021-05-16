@@ -20,7 +20,7 @@ GameObject:
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
-  m_StaticEditorFlags: 4294967295
+  m_StaticEditorFlags: 65
   m_IsActive: 1
 --- !u!4 &5000853231404932634
 Transform:
@@ -156,7 +156,7 @@ GameObject:
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
-  m_StaticEditorFlags: 4294967295
+  m_StaticEditorFlags: 65
   m_IsActive: 1
 --- !u!4 &5666978041559580353
 Transform:
@@ -231,6 +231,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: Point Light (4)
       objectReference: {fileID: 0}
+    - target: {fileID: 6606656061971878777, guid: e4dce3d96b2fa1545bcec75fd76be757, type: 3}
+      propertyPath: m_StaticEditorFlags
+      value: 65
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: e4dce3d96b2fa1545bcec75fd76be757, type: 3}
 --- !u!4 &1574880360554629191 stripped
@@ -248,6 +252,10 @@ PrefabInstance:
     - target: {fileID: 836993587289710822, guid: 2c8dce8575f9b0f4c988aadcbcb31aab, type: 3}
       propertyPath: m_Name
       value: Connector
+      objectReference: {fileID: 0}
+    - target: {fileID: 836993587289710822, guid: 2c8dce8575f9b0f4c988aadcbcb31aab, type: 3}
+      propertyPath: m_StaticEditorFlags
+      value: 65
       objectReference: {fileID: 0}
     - target: {fileID: 7137409805961233102, guid: 2c8dce8575f9b0f4c988aadcbcb31aab, type: 3}
       propertyPath: m_RootOrder
@@ -355,6 +363,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: Point Light (3)
       objectReference: {fileID: 0}
+    - target: {fileID: 6606656061971878777, guid: e4dce3d96b2fa1545bcec75fd76be757, type: 3}
+      propertyPath: m_StaticEditorFlags
+      value: 65
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: e4dce3d96b2fa1545bcec75fd76be757, type: 3}
 --- !u!4 &6051077797791455031 stripped
@@ -417,6 +429,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: Point Light (2)
       objectReference: {fileID: 0}
+    - target: {fileID: 6606656061971878777, guid: e4dce3d96b2fa1545bcec75fd76be757, type: 3}
+      propertyPath: m_StaticEditorFlags
+      value: 65
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: e4dce3d96b2fa1545bcec75fd76be757, type: 3}
 --- !u!4 &8469798358884807014 stripped
@@ -478,6 +494,10 @@ PrefabInstance:
     - target: {fileID: 6606656061971878777, guid: e4dce3d96b2fa1545bcec75fd76be757, type: 3}
       propertyPath: m_Name
       value: Point Light (1)
+      objectReference: {fileID: 0}
+    - target: {fileID: 6606656061971878777, guid: e4dce3d96b2fa1545bcec75fd76be757, type: 3}
+      propertyPath: m_StaticEditorFlags
+      value: 65
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: e4dce3d96b2fa1545bcec75fd76be757, type: 3}
