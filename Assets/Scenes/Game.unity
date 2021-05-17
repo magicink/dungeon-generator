@@ -399,7 +399,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: fd6208eff51a7874ebb43adca18ea0c1, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  mainLength: 5
+  mainLength: 15
   branches: 2
   branchLength: 5
   buildDelay: 0.1
