@@ -27,6 +27,7 @@ public class TileController : MonoBehaviour
     private bool _checkedForCollisions;
     private BoxCollider _boxCollider;
     private Rigidbody _rigidbody;
+    private bool isOriginNull;
 
     private void Awake()
     {
@@ -40,30 +41,33 @@ public class TileController : MonoBehaviour
 
     public void Start()
     {
-        var collisions = Physics.OverlapBox(transform.position, _boxCollider.size, Quaternion.identity, LayerMask.GetMask("Tile"));
-        if (collisions.Length <= 0) return;
-        foreach (var collision in collisions)
-        {
-            if (collision.gameObject != gameObject)
-            {
-                if (Origin == null)
-                {
-                    CollisionDetected = true;
-                }
-                else
-                {
-                    if (collision.gameObject != Origin.gameObject)
-                    {
-                        CollisionDetected = true;
-                    }
-                }
-            }
-        }
+        isOriginNull = Origin == null;
     }
 
     public List<Connector> GetConnectors()
     {
         Connectors = GetComponentsInChildren<Connector>().Where(c => !c.Connected).ToList();
         return Connectors;
+    }
+
+    public void DetectCollisions()
+    {
+        var collisions = Physics.OverlapBox(transform.position, _boxCollider.size, Quaternion.identity, LayerMask.GetMask("Tile"));
+        if (collisions.Length <= 0) return;
+        foreach (var collision in collisions)
+        {
+            if (collision.gameObject == gameObject) continue;
+            if (isOriginNull)
+            {
+                CollisionDetected = true;
+            }
+            else
+            {
+                if (collision.gameObject != Origin.gameObject)
+                {
+                    CollisionDetected = true;
+                }
+            }
+        }
     }
 }
