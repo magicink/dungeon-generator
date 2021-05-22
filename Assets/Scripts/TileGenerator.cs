@@ -1,13 +1,8 @@
-using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
-using System.Numerics;
 using UnityEngine;
 using UnityEngine.SceneManagement;
-using Quaternion = UnityEngine.Quaternion;
-using Random = UnityEngine.Random;
-using Vector3 = UnityEngine.Vector3;
 
 public class TileGenerator : MonoBehaviour
 {
@@ -180,71 +175,68 @@ public class TileGenerator : MonoBehaviour
                     yield return new WaitForEndOfFrame();
                     continue;
                 }
-                else
+
+                // Get available unused connectors
+                var availableConnectors = _from.GetConnectors().Where(c => !c.Connected).ToList();
+                // If there are available connectors select one at random
+                if (availableConnectors.Count > 0)
                 {
-                    // Get available unused connectors
-                    var availableConnectors = _from.GetConnectors().Where(c => !c.Connected).ToList();
-                    // If there are available connectors select one at random
-                    if (availableConnectors.Count > 0)
+                    var index = Random.Range(0, availableConnectors.Count);
+                    var fromConnector = availableConnectors[index];
+                    // Instantiate a new room
+                    var nextRoom = CreateTile();
+                    nextRoom.Origin = _from;
+                    // Get available connectors
+                    var targetConnectors = nextRoom.GetConnectors();
+                    if (targetConnectors.Count > 0)
                     {
-                        var index = Random.Range(0, availableConnectors.Count);
-                        var fromConnector = availableConnectors[index];
-                        // Instantiate a new room
-                        var nextRoom = CreateTile();
-                        nextRoom.Origin = _from;
-                        // Get available connectors
-                        var targetConnectors = nextRoom.GetConnectors();
-                        if (targetConnectors.Count > 0)
+                        // Pick a random target connector
+                        var targetIndex = Random.Range(0, targetConnectors.Count);
+                        var targetConnector = targetConnectors[targetIndex];
+                        // Re-parent next room to connector
+                        var targetTransform = targetConnector.transform;
+                        targetTransform.SetParent(fromConnector.transform);
+                        nextRoom.transform.SetParent(targetTransform);
+                        // Re-position next room
+                        // yield return new WaitForSeconds(buildDelay);
+                        targetTransform.localPosition = Vector3.zero;
+                        // yield return new WaitForSeconds(buildDelay);
+                        targetTransform.localRotation = Quaternion.identity;
+                        // yield return new WaitForSeconds(buildDelay);
+                        targetConnector.transform.Rotate(0, 180f, 0);
+                        // yield return new WaitForSeconds(buildDelay);
+                        nextRoom.transform.SetParent(_container);
+                        targetConnector.transform.SetParent(nextRoom.transform);
+                        // // Detect collision
+                        yield return new WaitForSeconds(buildDelay);
+                        nextRoom.DetectCollisions();
+                        yield return new WaitForEndOfFrame();
+                        // If collision is detected
+                        if (!nextRoom.CollisionDetected)
                         {
-                            // Pick a random target connector
-                            var targetIndex = Random.Range(0, targetConnectors.Count);
-                            var targetConnector = targetConnectors[targetIndex];
-                            // Re-parent next room to connector
-                            var targetTransform = targetConnector.transform;
-                            targetTransform.SetParent(fromConnector.transform);
-                            nextRoom.transform.SetParent(targetTransform);
-                            // Re-position next room
-                            // yield return new WaitForSeconds(buildDelay);
-                            targetTransform.localPosition = Vector3.zero;
-                            // yield return new WaitForSeconds(buildDelay);
-                            targetTransform.localRotation = Quaternion.identity;
-                            // yield return new WaitForSeconds(buildDelay);
-                            targetConnector.transform.Rotate(0, 180f, 0);
-                            // yield return new WaitForSeconds(buildDelay);
-                            nextRoom.transform.SetParent(_container);
-                            targetConnector.transform.SetParent(nextRoom.transform);
-                            // // Detect collision
+                            // Mark connector as used
+                            fromConnector.Connected = true;
+                            targetConnector.Connected = true;
+                            _from = nextRoom;
+                            _connectors.AddRange(targetConnectors);
+                            _availableAttempts = maxAttempts;
+                            _remainingRooms--;
                             yield return new WaitForSeconds(buildDelay);
-                            nextRoom.DetectCollisions();
-                            yield return new WaitForEndOfFrame();
-                            // If collision is detected
-                            if (!nextRoom.CollisionDetected)
-                            {
-                                // Mark connector as used
-                                fromConnector.Connected = true;
-                                targetConnector.Connected = true;
-                                _from = nextRoom;
-                                _connectors.AddRange(targetConnectors);
-                                _availableAttempts = maxAttempts;
-                                _remainingRooms--;
-                                yield return new WaitForSeconds(buildDelay);
-                                continue;
-                            }
-                            else
-                            {
-                                _availableAttempts--;
-                                if (_availableAttempts < 1)
-                                {
-                                    fromConnector.Connected = true;
-                                }
-                                nextRoom.gameObject.name = "Deactivated Room";
-                                nextRoom.gameObject.SetActive(false);
-                                // Destroy(nextRoom.gameObject);
-                                nextRoom.transform.SetParent(_container);
-                                yield return new WaitForSeconds(buildDelay);
-                                continue;
-                            }
+                            continue;
                         }
+
+                        _availableAttempts--;
+                        var nextConnectors = _connectors.Where(c => !c.Connected).ToList();
+                        var nextConnectorIndex = Random.Range(0, nextConnectors.Count);
+                        var nextConnector = nextConnectors[nextConnectorIndex];
+                        var nextFrom = nextConnector.transform.parent.GetComponent<TileController>();
+                        _from = nextFrom;
+                        nextRoom.gameObject.name = "Deactivated Room";
+                        nextRoom.gameObject.SetActive(false);
+                        // Destroy(nextRoom.gameObject);
+                        nextRoom.transform.SetParent(_container);
+                        yield return new WaitForSeconds(buildDelay);
+                        continue;
                     }
                 }
             }
