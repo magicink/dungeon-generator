@@ -54,39 +54,6 @@ public class TileGenerator : MonoBehaviour
         }
     }
 
-    // private IEnumerator BuildDungeon()
-    // {
-    //     _root = CreateStartTile();
-    //     _to = _root;
-    //     for (var i = 0; i < mainLength; i++)
-    //     {
-    //         yield return new WaitForSeconds(buildDelay);
-    //         _from = _to;
-    //         _to = CreateTile();
-    //         ConnectTiles();
-    //     }
-    //
-    //     if (branches <= 0) yield break;
-    //
-    //     for (var h = 0; h < branches; h++)
-    //     {
-    //         var branch = new GameObject($"Branch {h}");
-    //         _container = branch.transform;
-    //         _container.SetParent(transform);
-    //         var connector = _unconnected[Random.Range(0, _unconnected.Count)];
-    //         var tile = connector.transform.parent;
-    //         _root = tile;
-    //         _to = _root;
-    //         for (var j = 0; j < branchLength; j++)
-    //         {
-    //             yield return new WaitForSeconds(buildDelay);
-    //             _from = _to;
-    //             _to = CreateTile();
-    //             ConnectTiles();
-    //         }
-    //     }
-    // }
-
     private void Update()
     {
         if (Input.GetKeyDown(refreshKey))
@@ -117,42 +84,6 @@ public class TileGenerator : MonoBehaviour
         _tiles.Add(new Tile(tile.transform, origin));
         return tile.GetComponent<TileController>();
     }
-
-    // /**
-    //  * Generates a list of connectors per tile. It returns a random one
-    //  * and sends the remainder to the available connector collection.
-    //  */
-    // private Transform GetConnector(Component tile)
-    // {
-    //     var connectors = tile.GetComponentsInChildren<Connector>().Where(c => !c.Connected).ToList();
-    //     var index = Random.Range(0, connectors.Count);
-    //     var connector = connectors[index];
-    //     // Remove the selected connector
-    //     connectors.RemoveAt(index);
-    //     connector.Connected = true;
-    //
-    //     _unconnected.RemoveAll(u => u == connector);
-    //     _unconnected.AddRange(connectors);
-    //
-    //     return connector.transform;
-    // }
-
-    // private void ConnectTiles()
-    // {
-    //     if (!_from) return;
-    //     var fromConnector = GetConnector(_from);
-    //     if (!fromConnector) return;
-    //     if (!_to) return;
-    //     var toConnector = GetConnector(_to);
-    //     if (!toConnector) return;
-    //     toConnector.SetParent(fromConnector);
-    //     _to.SetParent(toConnector);
-    //     toConnector.localPosition = Vector3.zero;
-    //     toConnector.localRotation = Quaternion.identity;
-    //     toConnector.Rotate(0, 180f, 0);
-    //     _to.SetParent(_container);
-    //     toConnector.SetParent(_to);
-    // }
 
     private IEnumerator BuildDungeon()
     {
@@ -198,16 +129,12 @@ public class TileGenerator : MonoBehaviour
                         targetTransform.SetParent(fromConnector.transform);
                         nextRoom.transform.SetParent(targetTransform);
                         // Re-position next room
-                        // yield return new WaitForSeconds(buildDelay);
                         targetTransform.localPosition = Vector3.zero;
-                        // yield return new WaitForSeconds(buildDelay);
                         targetTransform.localRotation = Quaternion.identity;
-                        // yield return new WaitForSeconds(buildDelay);
                         targetConnector.transform.Rotate(0, 180f, 0);
-                        // yield return new WaitForSeconds(buildDelay);
                         nextRoom.transform.SetParent(_container);
                         targetConnector.transform.SetParent(nextRoom.transform);
-                        // // Detect collision
+                        // Detect collision
                         yield return new WaitForSeconds(buildDelay);
                         nextRoom.DetectCollisions();
                         yield return new WaitForEndOfFrame();
@@ -226,14 +153,12 @@ public class TileGenerator : MonoBehaviour
                         }
 
                         _availableAttempts--;
-                        var nextConnectors = _connectors.Where(c => !c.Connected).ToList();
-                        var nextConnectorIndex = Random.Range(0, nextConnectors.Count);
-                        var nextConnector = nextConnectors[nextConnectorIndex];
-                        var nextFrom = nextConnector.transform.parent.GetComponent<TileController>();
+                        var nextConnector = GetRandomConnector();
+                        var nextFrom = nextConnector.GetParentTile();
                         _from = nextFrom;
-                        nextRoom.gameObject.name = "Deactivated Room";
+                        var o = nextRoom.gameObject;
+                        o.name = $"{_container.name} - Deactivated {o.name}";
                         nextRoom.gameObject.SetActive(false);
-                        // Destroy(nextRoom.gameObject);
                         nextRoom.transform.SetParent(_container);
                         yield return new WaitForSeconds(buildDelay);
                         continue;
@@ -251,10 +176,8 @@ public class TileGenerator : MonoBehaviour
                     branch.transform.position = Vector3.zero;
                     branch.transform.SetParent(gameObject.transform);
                     _container = branch.transform;
-                    var connectors = _connectors.Where(c => !c.Connected).ToList();
-                    var connectorIndex = Random.Range(0, connectors.Count);
-                    var connector = connectors[connectorIndex];
-                    var connectorParent = connector.transform.parent.GetComponent<TileController>();
+                    var connector = GetRandomConnector();
+                    var connectorParent = connector.GetParentTile();
                     if (connectorParent)
                     {
                         _availableAttempts = maxAttempts;
@@ -267,5 +190,18 @@ public class TileGenerator : MonoBehaviour
 
             break;
         }
+    }
+
+    private Connector GetRandomConnector()
+    {
+        var connectors = _connectors.Where(c => !c.Connected).ToList();
+        var connectorIndex = Random.Range(0, connectors.Count);
+        var connector = connectors[connectorIndex];
+        return connector;
+    }
+
+    private TileController GetConnectorParent(Connector connector)
+    {
+        return connector.transform.parent.GetComponent<TileController>();
     }
 }

@@ -36,4 +36,9 @@ public class Connector : MonoBehaviour
         Gizmos.DrawLine(bottomRight, offset);
         Gizmos.DrawLine(bottomLeft, offset);
     }
+
+    public TileController GetParentTile()
+    {
+        return transform.parent.gameObject.GetComponent<TileController>();
+    }
 }
