@@ -3,8 +3,9 @@ using UnityEngine;
 public class Connector : MonoBehaviour
 {
     [SerializeField] private Vector2 size = Vector2.one * 4.0f;
+    [SerializeField] private bool connected;
     
-    public bool Connected { get; set; }
+    public bool Connected { get => connected; set => connected = value; }
     
     private Vector2 _halfSize;
 

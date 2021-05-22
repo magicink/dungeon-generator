@@ -422,6 +422,7 @@ MonoBehaviour:
   - {fileID: 9066130841378201093, guid: 9b7e013d6bb59224492cd2e03c148dc5, type: 3}
   - {fileID: 9066130841378201093, guid: 9b7e013d6bb59224492cd2e03c148dc5, type: 3}
   - {fileID: 5865122989363767821, guid: ea63dedf3f7ab784793cc3cb40063fd4, type: 3}
+  - {fileID: 5865122989363767821, guid: ea63dedf3f7ab784793cc3cb40063fd4, type: 3}
   refreshKey: 8
 --- !u!4 &1914191701
 Transform:
