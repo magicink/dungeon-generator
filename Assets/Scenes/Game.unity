@@ -399,9 +399,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: fd6208eff51a7874ebb43adca18ea0c1, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  mainLength: 45
+  mainLength: 50
   branches: 10
-  branchLength: 30
+  branchLength: 50
   buildDelay: 0
   maxAttempts: 50
   capTiles:

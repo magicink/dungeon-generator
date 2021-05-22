@@ -148,7 +148,6 @@ public class TileGenerator : MonoBehaviour
                             _connectors.AddRange(targetConnectors);
                             _availableAttempts = maxAttempts;
                             _remainingRooms--;
-                            yield return new WaitForSeconds(buildDelay);
                             continue;
                         }
 
@@ -160,7 +159,6 @@ public class TileGenerator : MonoBehaviour
                         o.name = $"{_container.name} - Deactivated {o.name}";
                         nextRoom.gameObject.SetActive(false);
                         nextRoom.transform.SetParent(_container);
-                        yield return new WaitForSeconds(buildDelay);
                         continue;
                     }
                 }
