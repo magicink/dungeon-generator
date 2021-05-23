@@ -41,6 +41,16 @@ public class TileController : MonoBehaviour
     {
         isOriginNull = Origin == null;
         TileGenerator.HandleBuildComplete += HandleBuildComplete;
+        GameController.HandleCurrentChanged += HandleCurrentChanged;
+        GameController.HandleGameReady += HandleReady;
+    }
+
+    private void HandleReady()
+    {
+    }
+
+    private void HandleCurrentChanged(TileController tileController)
+    {
     }
 
     public List<Connector> GetUnconnected()
