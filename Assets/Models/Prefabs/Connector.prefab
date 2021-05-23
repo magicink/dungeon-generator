@@ -10,7 +10,7 @@ GameObject:
   m_Component:
   - component: {fileID: 7137409805961233102}
   - component: {fileID: -7171475848199561880}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: Connector
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -44,3 +44,4 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   size: {x: 4, y: 4}
+  connected: 0

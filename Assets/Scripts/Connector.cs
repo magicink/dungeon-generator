@@ -6,8 +6,14 @@ public class Connector : MonoBehaviour
     [SerializeField] private bool connected;
     
     public bool Connected { get => connected; set => connected = value; }
-    
+
     private Vector2 _halfSize;
+    private TileController _parent;
+
+    private void Start()
+    {
+        _parent = transform.parent.gameObject.GetComponent<TileController>();
+    }
 
     private void OnDrawGizmos()
     {
@@ -39,6 +45,6 @@ public class Connector : MonoBehaviour
 
     public TileController GetParentTile()
     {
-        return transform.parent.gameObject.GetComponent<TileController>();
+        return _parent;
     }
 }

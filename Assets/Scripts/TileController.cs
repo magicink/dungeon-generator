@@ -1,30 +1,28 @@
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
+using Random = UnityEngine.Random;
 
 public class TileController : MonoBehaviour
 {
     [SerializeField] private TileController origin;
     [SerializeField] private List<Connector> connectors;
+    [SerializeField] private List<TileController> neighbors = new List<TileController>();
 
     public TileController Origin
     {
         get => origin;
         set => origin = value;
     }
-    
-    public List<Connector> Connectors
+
+    private List<Connector> Connectors
     {
         get => connectors;
-        private set => connectors = value;
+        set => connectors = value;
     }
 
-    public delegate void OnCreation(TileController tileController);
-    public OnCreation HandleCreation;
-    
-    public bool CollisionDetected { get; set; }
-    
-    private bool _checkedForCollisions;
+    public bool CollisionDetected { get; private set; }
+
     private BoxCollider _boxCollider;
     private Rigidbody _rigidbody;
     private bool isOriginNull;
@@ -36,18 +34,18 @@ public class TileController : MonoBehaviour
         _rigidbody = gameObject.AddComponent<Rigidbody>();
         _rigidbody.useGravity = false;
         _rigidbody.isKinematic = true;
-        GetConnectors();
+        Connectors = GetComponentsInChildren<Connector>().ToList();
     }
 
     public void Start()
     {
         isOriginNull = Origin == null;
+        TileGenerator.HandleBuildComplete += HandleBuildComplete;
     }
 
-    public List<Connector> GetConnectors()
+    public List<Connector> GetUnconnected()
     {
-        Connectors = GetComponentsInChildren<Connector>().Where(c => !c.Connected).ToList();
-        return Connectors;
+        return Connectors.Where(c => !c.Connected).ToList();
     }
 
     public void DetectCollisions()
@@ -59,7 +57,7 @@ public class TileController : MonoBehaviour
             if (collision.gameObject == gameObject) continue;
             if (isOriginNull)
             {
-                CollisionDetected = true;
+                CollisionDetected = false;
             }
             else
             {
@@ -69,5 +67,31 @@ public class TileController : MonoBehaviour
                 }
             }
         }
+    }
+
+    private void HandleBuildComplete(TileGenerator tileGenerator)
+    {
+        if (!gameObject.activeSelf)
+        {
+            Destroy(gameObject);
+        }
+        else
+        {
+            _boxCollider.enabled = false;
+            if (tileGenerator.Walls.Length <= 0) return;
+            var unused = GetUnconnected();
+            foreach (var connector in unused)
+            {
+                var wallIndex = Random.Range(0, tileGenerator.Walls.Length);
+                var wallPrefab = tileGenerator.Walls[wallIndex];
+                var connectorTransform = connector.transform;
+                Instantiate(wallPrefab, connectorTransform.position, connectorTransform.rotation, connectorTransform);
+            }
+        }
+    }
+
+    public void AddNeighbor(TileController tileController)
+    {
+        neighbors.Add(tileController);
     }
 }

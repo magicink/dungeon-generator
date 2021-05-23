@@ -6,6 +6,7 @@ using UnityEngine.SceneManagement;
 
 public class TileGenerator : MonoBehaviour
 {
+    #region Editor API
     [Header("Settings")]
     
     [Range(2, 50)][SerializeField] private int mainLength = 10;
@@ -18,20 +19,33 @@ public class TileGenerator : MonoBehaviour
     
     [SerializeField] private GameObject[] capTiles;
     [SerializeField] private GameObject[] tiles;
+    [SerializeField] private GameObject[] walls;
 
     [Header("Debugging")]
-    
-    [SerializeField] private KeyCode refreshKey = KeyCode.Backspace;
 
+    [SerializeField] private KeyCode refreshKey = KeyCode.Backspace;
+    #endregion
+    
+    public GameObject[] Walls => walls;
+
+    #region Events
+    public delegate void OnBuildComplete(TileGenerator tileGenerator);
+    public static OnBuildComplete HandleBuildComplete;
+    #endregion
+
+    #region Internal
     private readonly int[] _startRotation = {0, 90, 180, 270};
-    private readonly List<Tile> _tiles = new List<Tile>();
     private readonly List<Connector> _connectors = new List<Connector>();
     private int _remainingRooms;
     private int _remainingBranches;
     private int _availableAttempts;
+    private bool _dirty;
+    private bool _buildComplete;
+    private bool _sealed;
 
-    private Transform _root, _container;
-    private TileController _from, _to;
+    private Transform _container;
+    private TileController _from;
+    #endregion
 
     private void Awake()
     {
@@ -46,10 +60,8 @@ public class TileGenerator : MonoBehaviour
         branch.transform.position = Vector3.zero;
         _container = branch.transform;
         _container.SetParent(transform);
-        // StartCoroutine(BuildDungeon());
         if (tiles.Length > 1 && capTiles.Length > 1)
         {
-            // BuildDungeon();
             StartCoroutine(BuildDungeon());
         }
     }
@@ -60,18 +72,22 @@ public class TileGenerator : MonoBehaviour
         {
             SceneManager.LoadScene("Scenes/Game");
         }
+
+        if (!_buildComplete || _sealed) return;
+        HandleBuildComplete?.Invoke(this);
+        _sealed = true;
     }
 
     private TileController CreateStartTile()
     {
         var capIndex = Random.Range(0, capTiles.Length);
         var rotationIndex = Random.Range(0, _startRotation.Length);
-        var startCap = Instantiate(capTiles[capIndex], Vector3.zero, Quaternion.identity, _container);
-        startCap.name = "Starting Tile";
+        var startTile = Instantiate(capTiles[capIndex], Vector3.zero, Quaternion.identity, _container);
+        startTile.name = "Starting Tile";
         var rotation = _startRotation[rotationIndex];
-        startCap.transform.Rotate(0, rotation, 0);
-        _tiles.Add(new Tile(startCap.transform, null));
-        return startCap.GetComponent<TileController>();
+        startTile.transform.Rotate(0, rotation, 0);
+        var startTileController = startTile.GetComponent<TileController>();
+        return startTileController;
     }
 
     private TileController CreateTile()
@@ -79,71 +95,61 @@ public class TileGenerator : MonoBehaviour
         if (tiles.Length < 1) return null;
         var tileIndex = Random.Range(0, tiles.Length);
         var tile = Instantiate(tiles[tileIndex], Vector3.zero, Quaternion.identity, _container);
-        // var origin = _tiles[_tiles.FindIndex(x => x.Transform == _from)].Transform;
-        var origin = _from.transform;
-        _tiles.Add(new Tile(tile.transform, origin));
-        return tile.GetComponent<TileController>();
+        var tileController = tile.GetComponent<TileController>();
+        return tileController;
     }
 
     private IEnumerator BuildDungeon()
     {
         while (true)
         {
-            // If remaining rooms > 0
             if (_remainingRooms > 0 && _availableAttempts > 0)
             {
-                // If _from is empty this is the first room
-                if (_from == null)
+                if (!_dirty)
                 {
-                    // Instantiate room
-                    // Assign room to _from
+                    _dirty = true;
                     _from = CreateStartTile();
                     _from.transform.SetParent(_container);
-                    // Get connectors
-                    _connectors.AddRange(_from.GetConnectors());
-                    // Reduce remaining rooms
+                    _connectors.AddRange(_from.GetUnconnected());
                     _remainingRooms--;
                     yield return new WaitForEndOfFrame();
                     continue;
                 }
 
-                // Get available unused connectors
-                var availableConnectors = _from.GetConnectors().Where(c => !c.Connected).ToList();
-                // If there are available connectors select one at random
+                var availableConnectors = _from.GetUnconnected().Where(c => !c.Connected).ToList();
                 if (availableConnectors.Count > 0)
                 {
                     var index = Random.Range(0, availableConnectors.Count);
                     var fromConnector = availableConnectors[index];
-                    // Instantiate a new room
                     var nextRoom = CreateTile();
+                    var targetConnectors = nextRoom.GetUnconnected();
+                    
                     nextRoom.Origin = _from;
-                    // Get available connectors
-                    var targetConnectors = nextRoom.GetConnectors();
+
                     if (targetConnectors.Count > 0)
                     {
-                        // Pick a random target connector
                         var targetIndex = Random.Range(0, targetConnectors.Count);
                         var targetConnector = targetConnectors[targetIndex];
-                        // Re-parent next room to connector
                         var targetTransform = targetConnector.transform;
+                        var nextRoomTransform = nextRoom.transform;
+
                         targetTransform.SetParent(fromConnector.transform);
                         nextRoom.transform.SetParent(targetTransform);
-                        // Re-position next room
                         targetTransform.localPosition = Vector3.zero;
                         targetTransform.localRotation = Quaternion.identity;
                         targetConnector.transform.Rotate(0, 180f, 0);
-                        nextRoom.transform.SetParent(_container);
-                        targetConnector.transform.SetParent(nextRoom.transform);
-                        // Detect collision
+                        nextRoomTransform.SetParent(_container);
+                        targetConnector.transform.SetParent(nextRoomTransform);
+
                         yield return new WaitForSeconds(buildDelay);
                         nextRoom.DetectCollisions();
                         yield return new WaitForEndOfFrame();
-                        // If collision is detected
+                        
                         if (!nextRoom.CollisionDetected)
                         {
-                            // Mark connector as used
                             fromConnector.Connected = true;
                             targetConnector.Connected = true;
+                            _from.AddNeighbor(nextRoom);
                             _from = nextRoom;
                             _connectors.AddRange(targetConnectors);
                             _availableAttempts = maxAttempts;
@@ -152,13 +158,15 @@ public class TileGenerator : MonoBehaviour
                         }
 
                         _availableAttempts--;
-                        var nextConnector = GetRandomConnector();
-                        var nextFrom = nextConnector.GetParentTile();
-                        _from = nextFrom;
-                        var o = nextRoom.gameObject;
-                        o.name = $"{_container.name} - Deactivated {o.name}";
-                        nextRoom.gameObject.SetActive(false);
+                        var nextRoomGameObject = nextRoom.gameObject;
+                        nextRoomGameObject.SetActive(false);
                         nextRoom.transform.SetParent(_container);
+                        var nextConnector = GetAvailableConnector();
+                        if (nextConnector)
+                        {
+                            var nextFrom = nextConnector.GetParentTile();
+                            _from = nextFrom;
+                        }
                         continue;
                     }
                 }
@@ -168,13 +176,12 @@ public class TileGenerator : MonoBehaviour
                 _remainingBranches--;
                 if (_remainingBranches > 0)
                 {
-                    // Pick new _from
                     var branchName = $"Branch {branches - _remainingBranches}";
                     var branch = new GameObject(branchName);
                     branch.transform.position = Vector3.zero;
                     branch.transform.SetParent(gameObject.transform);
                     _container = branch.transform;
-                    var connector = GetRandomConnector();
+                    var connector = GetAvailableConnector();
                     var connectorParent = connector.GetParentTile();
                     if (connectorParent)
                     {
@@ -185,21 +192,18 @@ public class TileGenerator : MonoBehaviour
                     }
                 }
             }
-
+            
+            // Seal the dungeon
+            _buildComplete = true;
             break;
         }
     }
 
-    private Connector GetRandomConnector()
+    private Connector GetAvailableConnector()
     {
         var connectors = _connectors.Where(c => !c.Connected).ToList();
         var connectorIndex = Random.Range(0, connectors.Count);
         var connector = connectors[connectorIndex];
         return connector;
-    }
-
-    private TileController GetConnectorParent(Connector connector)
-    {
-        return connector.transform.parent.GetComponent<TileController>();
     }
 }
